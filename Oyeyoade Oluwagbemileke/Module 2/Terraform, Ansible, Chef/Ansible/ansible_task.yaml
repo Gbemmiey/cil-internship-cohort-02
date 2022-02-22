@@ -1,0 +1,24 @@
+---
+- name: Deploy lambda function with ansible
+  hosts: 127.0.0.1
+  connection: local
+  become: true
+
+  pip:
+    name: boto3
+
+  community.aws.iam_role:
+    name: lambda_role
+    assume_role_policy_document: {{ lookup('file', 'policy.json') }}
+
+  community.aws.lambda:
+    name: PythonLambda
+    state: present
+    runtime: python3.6
+    role: lambda_role.Arn
+    handler: 'index.print_hello'
+    zip_file: |
+          def print_hello(event, context):
+            message = 'Inline python on AWS Lambda'
+            return message
+          

@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A Cloudformation template to provision Lambda Function & S3 bucket
+
+Resources:
+  s3Bucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      AccessControl: PublicRead
+      BucketName: cil-mod2-s3 
+
+  HelloLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: HelloLambdaRole
+      AssumeRolePolicyDocument: 
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: "sts:AssumeRole"
+
+  helloPython:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: inline (python) Lambda function 
+      MemorySize: 128
+      PackageType: Zip
+      Role: !GetAtt HelloLambdaRole.Arn
+      Handler: index.print_hello
+      Runtime: python3.6
+      Code:
+        ZipFile: |
+          def print_hello(event, context):
+            message = 'Inline python on AWS Lambda'
+            return message
+          
